@@ -1,0 +1,23 @@
+{
+    "name": "alwaysblank/brick",
+    "description": "Build HTML elements.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "AlwaysBlank\\Brick\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ben Martinez-Bateman",
+            "email": "ben@alwaysblank.dev"
+        }
+    ],
+    "require": {
+      "php": ">=8.2",
+      "ext-ctype": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    }
+}
