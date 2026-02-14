@@ -1,13 +1,13 @@
 <?php
 
-namespace AlwaysBlank\Brick;
+namespace AlwaysBlank\Brick\Tag;
 
-use AlwaysBlank\Brick\Interface\IsTag;
+use AlwaysBlank\Brick\Interface\ElementTag;
 
-readonly class CustomTag implements IsTag, \Stringable {
+readonly class CustomTag implements ElementTag {
 	protected string $tag;
 
-	protected function __construct(string $tag, protected bool $is_void = false) {
+	final protected function __construct(string $tag, protected bool $is_void = false) {
 		$tag = strtolower($tag);
 		if ( 3 > strlen($tag) || ! ctype_alpha( $tag[0] ) || ! str_contains($tag, '-')) {
 			throw new \InvalidArgumentException('Invalid tag name: ' . $tag);
@@ -28,9 +28,5 @@ readonly class CustomTag implements IsTag, \Stringable {
 
 	public static function factory(string $tag, bool $is_void = false) : static {
 		return new static($tag, $is_void);
-	}
-
-	public function __toString() : string {
-		return $this->tag;
 	}
 }

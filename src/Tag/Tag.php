@@ -1,11 +1,11 @@
 <?php
 
-namespace AlwaysBlank\Brick;
+namespace AlwaysBlank\Brick\Tag;
 
 use AlwaysBlank\Brick\Attribute\IsVoid;
-use AlwaysBlank\Brick\Interface\IsTag;
+use AlwaysBlank\Brick\Interface\ElementTag;
 
-enum Tag: string implements IsTag {
+enum Tag: string implements ElementTag {
 	case A = 'a';
 	case ABBR = 'abbr';
 	case ADDRESS = 'address';
