@@ -2,8 +2,6 @@
 
 namespace AlwaysBlank\Brick\Tests;
 
-use AlwaysBlank\Brick\Brick\Attribute;
-use AlwaysBlank\Brick\Brick\Brick;
 use AlwaysBlank\Brick\Brick\Element;
 use AlwaysBlank\Brick\Brick\Scalar;
 use AlwaysBlank\Brick\Interface\IsComparable;
@@ -42,7 +40,6 @@ class ElementTest extends TestCase {
 	#[DataProvider( 'provide_has_child' )]
 	public function test_has_child(Element $element, \Stringable&IsComparable $content, bool $should_contain): void {
 		self::assertSame($should_contain, $element->has_child($content));
-		var_dump((string)Brick::div(['hi', 'there', 'friend'], Attribute::factory('data-test', 'value')));
 	}
 
 	public static function provide_has_descendant(): array {
