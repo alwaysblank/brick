@@ -2,6 +2,7 @@
     "name": "alwaysblank/brick",
     "description": "Build HTML elements.",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "AlwaysBlank\\Brick\\": "src/",
