@@ -147,4 +147,12 @@ enum Tag: string implements ElementTag {
 	public function tag(): string {
 		return $this->value;
 	}
+
+	public static function get( string $name ) : ElementTag {
+		$tag = self::tryFrom( $name );
+		if ( $tag instanceof Tag ) {
+			return $tag;
+		}
+		return CustomTag::factory( $name );
+	}
 }

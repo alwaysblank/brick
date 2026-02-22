@@ -1,0 +1,10 @@
+parameters:
+	level: max
+	paths:
+		- src
+	typeAliases:
+	    ScalarValue: 'int|float|string|bool'
+	    ElementAttributeValue: 'float|int|\JsonSerializable|\Stringable|string|null'
+	    ElementContent: 'AlwaysBlank\Brick\Brick\Element|AlwaysBlank\Brick\Brick\Scalar|mixed[]|ScalarValue|array<AlwaysBlank\Brick\Brick\Element|AlwaysBlank\Brick\Brick\Scalar|mixed[]|ScalarValue>'
+	    AttributeArray: 'array{0: \AlwaysBlank\Brick\Interface\ElementAttributeName, 1?: ElementAttributeValue}'
+	    ElementArray: 'array{0: \AlwaysBlank\Brick\Interface\ElementTag, 1?: ElementContent, 2?: array<AlwaysBlank\Brick\Brick\Attribute|AttributeArray>}'

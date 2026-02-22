@@ -8,11 +8,7 @@ readonly class CustomTag implements ElementTag {
 	protected string $tag;
 
 	final protected function __construct(string $tag, protected bool $is_void = false) {
-		$tag = strtolower($tag);
-		if ( 3 > strlen($tag) || ! ctype_alpha( $tag[0] ) || ! str_contains($tag, '-')) {
-			throw new \InvalidArgumentException('Invalid tag name: ' . $tag);
-		}
-		$this->tag = $tag;
+		$this->tag = strtolower($tag);
 	}
 
 	/**

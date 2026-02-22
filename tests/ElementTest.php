@@ -6,9 +6,11 @@ use AlwaysBlank\Brick\Brick\Element;
 use AlwaysBlank\Brick\Brick\Scalar;
 use AlwaysBlank\Brick\Interface\IsComparable;
 use AlwaysBlank\Brick\Tag\Tag;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass( Element::class )]
 class ElementTest extends TestCase {
 	public static function provide_has_child(): array {
 		return [

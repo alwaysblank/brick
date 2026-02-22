@@ -6,11 +6,14 @@ use AlwaysBlank\Brick\Brick\Attribute;
 use AlwaysBlank\Brick\Brick\Element;
 use AlwaysBlank\Brick\Brick\Scalar;
 use AlwaysBlank\Brick\Crawler;
+use AlwaysBlank\Brick\Tag\AttributeName;
 use AlwaysBlank\Brick\Tag\Tag;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
+#[CoversClass( Crawler::class)]
 class CrawlerTest extends \PHPUnit\Framework\TestCase {
 	public static function provide_find(): array {
 		return [
@@ -19,7 +22,7 @@ class CrawlerTest extends \PHPUnit\Framework\TestCase {
 				$element = Element::factory(Tag::DIV, [
 					$search_for,
 					new StopTest(),
-				], [Attribute::factory('class', 'sandwich')]);
+				], [Attribute::factory(AttributeName::CL, 'sandwich')]);
 				$callback = fn($content) => $content instanceof Element && $content->tag === Tag::P;
 
 				return [$element, $search_for, $callback, true];

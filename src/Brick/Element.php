@@ -29,10 +29,16 @@ class Element implements IsHashable, IsComparable, Stringable, HasContent {
 	 * we can verify them on construction.
 	 *
 	 * @param ElementTag $tag
-	 * @param mixed[]                                   $content
-	 * @param mixed[]                                   $attributes
+	 * @param mixed|mixed[]                                   $content
+	 * @param mixed|mixed[]                                   $attributes
 	 */
-	final protected function __construct( public readonly ElementTag $tag, array $content = [], array $attributes = []) {
+	final protected function __construct( public readonly ElementTag $tag, mixed $content = [], mixed $attributes = []) {
+		if ( ! is_array($content) ) {
+			$content = [$content];
+		}
+		if ( ! is_array($attributes) ) {
+			$attributes = [$attributes];
+		}
 		$this->content = array_values( array_filter( array_map(fn($v) => is_scalar($v) ? Scalar::factory($v) : $v, $content), fn( $c ) => is_object($c) && is_a($c, IsComparable::class) && is_a($c, Stringable::class) && !$this->is_same($c)));
 		$this->attributes = array_values( array_filter( $attributes, static fn( $a ) => $a instanceof Attribute ));
 	}
@@ -148,12 +154,12 @@ class Element implements IsHashable, IsComparable, Stringable, HasContent {
 
 	/**
 	 * @param ElementTag $tag
-	 * @param list<Stringable>                                   $content
-	 * @param list<Attribute>                                   $attributes
+	 * @param mixed|mixed[]                                   $content
+	 * @param mixed|mixed[]                                   $attributes
 	 *
 	 * @return static
 	 */
-	public static function factory( ElementTag $tag, array $content = [], array $attributes = [] ): static {
+	public static function factory( ElementTag $tag, mixed $content = [], mixed $attributes = [] ): static {
 		return new static( $tag, $content, $attributes );
 	}
 }
