@@ -4,6 +4,7 @@ namespace AlwaysBlank\Brick;
 
 use AlwaysBlank\Brick\Brick\Element;
 use AlwaysBlank\Brick\Interface\HasContent;
+use AlwaysBlank\Brick\Interface\IsArrayable;
 use Closure, Stringable;
 
 class Crawler {
@@ -15,25 +16,30 @@ class Crawler {
 	/**
 	 * Recursively crawl the element and its content; think of it kind of like a recursive `map()`.
 	 *
-	 * @phpstan-param Closure(Stringable, int, Stringable): ?Stringable $callback
+	 * @phpstan-param Closure(mixed, int, Stringable): mixed $callback
 	 */
-	protected function crawler(Stringable $element, Closure $callback) : null|Stringable {
+	protected function crawler(mixed $current, Closure $callback) : mixed {
 		$this->level ??= 0;
-		$processed_element = $callback($element, $this->level, $this->element);
-		if (! $processed_element instanceof Stringable) {
+		$processed = $callback($current, $this->level, $this->element);
+		if (! $processed instanceof Stringable) {
 			return null;
 		}
-		if ($processed_element instanceof HasContent) {
+		if ($processed instanceof HasContent) {
 			$this->level++;
-			$crawled = array_map(fn($el) => $this->crawler($el, $callback), $processed_element->get_content());
-			if ($crawled === $processed_element->get_content()) {
-				// Nothing has been changed, so return the original object.
-				return $processed_element;
+			$crawled = array_map(fn($el) => $this->crawler($el, $callback), [...$processed]);
+			try {
+				if( json_encode( [ ...$crawled ], JSON_THROW_ON_ERROR ) === json_encode( [ ...$processed ],
+						JSON_THROW_ON_ERROR ) ) {
+					// Nothing has changed, so return the original object.
+					return $processed;
+				}
+			} catch (\JsonException $e) {
+				// no-op.
 			}
-			return $processed_element->replace_content(array_values(array_filter($crawled)));
+			return $processed::factory(...$crawled);
 		}
 		$this->level--;
-		return $processed_element;
+		return $processed;
 	}
 
 	/**

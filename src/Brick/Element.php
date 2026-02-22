@@ -3,19 +3,21 @@
 namespace AlwaysBlank\Brick\Brick;
 
 use AlwaysBlank\Brick\Crawler;
-use AlwaysBlank\Brick\Interface\{ElementTag, IsComparable, IsHashable, HasContent};
-use AlwaysBlank\Brick\Traits\{ Comparable, Hashable, Renderable};
+use AlwaysBlank\Brick\Interface\{ElementTag, IsComparable, IsContent, IsHashable, HasContent};
+use AlwaysBlank\Brick\Traits\{Arrayable, Comparable, Hashable, Renderable};
 use Stringable;
 
 /**
  */
-class Element implements IsHashable, IsComparable, Stringable, HasContent {
-	use Hashable, Comparable, Renderable;
+class Element implements IsHashable, IsComparable, IsContent, HasContent {
+	use Hashable, Comparable, Renderable, Arrayable;
+
+	private int $index = 0;
 
 	/**
 	 * The content elements contained by this one.
 	 *
-	 * @phpstan-var list<IsComparable&Stringable> $content
+	 * @phpstan-var list<IsContent> $content
 	 */
 	readonly public array $content;
 
@@ -25,22 +27,21 @@ class Element implements IsHashable, IsComparable, Stringable, HasContent {
 	readonly public array $attributes;
 
 	/**
-	 * No type is defined for the `$content` or `$attributes` arguments so that
-	 * we can verify them on construction.
-	 *
-	 * @param ElementTag $tag
-	 * @param mixed|mixed[]                                   $content
-	 * @param mixed|mixed[]                                   $attributes
 	 */
-	final protected function __construct( public readonly ElementTag $tag, mixed $content = [], mixed $attributes = []) {
-		if ( ! is_array($content) ) {
-			$content = [$content];
+	final protected function __construct( public readonly ElementTag $tag, self|Attribute|Scalar|IsContent|string|Stringable|int|float|bool ...$args) {
+		$content = [];
+		$attributes = [];
+		foreach($args as $arg) {
+			if ( $arg instanceof Attribute ) {
+				$attributes[] = $arg;
+			} elseif ( $arg instanceof IsContent ) {
+				$content[] = $arg;
+			} else {
+				$content[] = Scalar::factory( (string) $arg );
+			}
 		}
-		if ( ! is_array($attributes) ) {
-			$attributes = [$attributes];
-		}
-		$this->content = array_values( array_filter( array_map(fn($v) => is_scalar($v) ? Scalar::factory($v) : $v, $content), fn( $c ) => is_object($c) && is_a($c, IsComparable::class) && is_a($c, Stringable::class) && !$this->is_same($c)));
-		$this->attributes = array_values( array_filter( $attributes, static fn( $a ) => $a instanceof Attribute ));
+		$this->content = $content;
+		$this->attributes = $attributes;
 	}
 
 	public function get_content(): array {
@@ -153,13 +154,79 @@ class Element implements IsHashable, IsComparable, Stringable, HasContent {
 	}
 
 	/**
-	 * @param ElementTag $tag
-	 * @param mixed|mixed[]                                   $content
-	 * @param mixed|mixed[]                                   $attributes
-	 *
-	 * @return static
 	 */
-	public static function factory( ElementTag $tag, mixed $content = [], mixed $attributes = [] ): static {
-		return new static( $tag, $content, $attributes );
+	public static function factory( ElementTag $tag, self|Attribute|Scalar|IsContent|string|Stringable|int|float|bool ...$args ): static {
+		return new static( $tag, ...$args );
+	}
+
+	/**
+	 * Get the type and internal index of an item at top-level index of `$i`.
+	 *
+	 * @phpstan-return array{0: int<0, max>, 1: 'tag'|'content'|'attribute'}|null
+	 */
+	protected function get_type_index(int $i) : ?array {
+		if ( $i < 0 ) {
+			return null; // PHP doesn't do anything special w/ negative indices, and we're not storing anything there.
+		}
+
+		// index 0 refers to the element's tag
+		if ( $i === 0 ) {
+			return [ 0, 'tag' ];
+		}
+
+		// indices 1..N refer to content
+		$content_index = $i - 1;
+		if ( isset( $this->content[ $content_index ] ) ) {
+			return [ $content_index, 'content' ];
+		}
+
+		// indices after content refer to attributes
+		$content_length = count( $this->content );
+		$attribute_index = $i - 1 - $content_length;
+		if ( isset( $this->attributes[ $attribute_index ] ) ) {
+			return [ $attribute_index, 'attribute' ];
+		}
+
+		return null;
+	}
+
+	public function current() : ElementTag|IsContent|Attribute|null {
+		$type_index = $this->get_type_index( $this->index );
+		if (null === $type_index) {
+			return null;
+		}
+		[$i, $type] = $type_index;
+
+		return match($type) {
+			'tag' => $this->tag,
+			'content' => $this->content[$i],
+			'attribute' => $this->attributes[$i],
+		};
+	}
+
+	public function next() : void {
+		$this->index++;
+	}
+
+	public function key() : ?string {
+		$type_index = $this->get_type_index( $this->index );
+		if (null === $type_index) {
+			return null;
+		}
+		[$i, $type] = $type_index;
+
+		return match ($type) {
+			'tag' => 'tag',
+			'content' => "content_$i",
+			'attribute' => "attribute_$i",
+		};
+	}
+
+	public function valid() : bool {
+		return null !== $this->get_type_index( $this->index );
+	}
+
+	public function rewind() : void {
+		$this->index = 0;
 	}
 }

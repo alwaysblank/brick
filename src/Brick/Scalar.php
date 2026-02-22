@@ -2,13 +2,13 @@
 
 namespace AlwaysBlank\Brick\Brick;
 
-use AlwaysBlank\Brick\Interface\{IsComparable, IsHashable};
+use AlwaysBlank\Brick\Interface\{IsComparable, IsContent, IsHashable};
 use AlwaysBlank\Brick\Traits\{Comparable, Hashable, Renderable};
 use Stringable;
 
 /**
  */
-class Scalar implements IsHashable, IsComparable, Stringable {
+class Scalar implements IsHashable, IsComparable, IsContent {
 	use Hashable, Comparable, Renderable;
 
 	/**

@@ -4,7 +4,7 @@ namespace AlwaysBlank\Brick\Interface;
 
 use Stringable;
 
-interface HasContent {
+interface HasContent extends IsArrayable {
 	/**
 	 * @return list<Stringable>
 	 */
