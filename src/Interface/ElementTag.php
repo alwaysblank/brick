@@ -2,7 +2,7 @@
 
 namespace AlwaysBlank\Brick\Interface;
 
-interface IsTag {
+interface ElementTag {
 	/**
 	 * Is this a void (or "self-closing") tag?
 	 */
